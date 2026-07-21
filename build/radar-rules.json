@@ -4942,27 +4942,6 @@
       }
     ]
   },
-  "pawchive.st": {
-    "_name": "Pawchive",
-    ".": [
-      {
-        "title": "Posts",
-        "docs": "https://docs.rsshub.app/routes/anime",
-        "source": [
-          "/"
-        ],
-        "target": "/pawchive/:service/:id"
-      },
-      {
-        "title": "Posts",
-        "docs": "https://docs.rsshub.app/routes/anime",
-        "source": [
-          "/:service/user/:id"
-        ],
-        "target": "/pawchive/:service/:id"
-      }
-    ]
-  },
   "pixabay.com": {
     "_name": "Pixabay",
     ".": [
@@ -20973,6 +20952,27 @@
       }
     ]
   },
+  "gdmuseum.org.cn": {
+    "_name": "Guangdong Museum",
+    "www": [
+      {
+        "title": "Current Exhibitions",
+        "docs": "https://docs.rsshub.app/routes/travel",
+        "source": [
+          "/col9/list"
+        ],
+        "target": "/gdmuseum/exhibition"
+      },
+      {
+        "title": "Information",
+        "docs": "https://docs.rsshub.app/routes/travel",
+        "source": [
+          "/cn/col51/list"
+        ],
+        "target": "/gdmuseum/information"
+      }
+    ]
+  },
   "gdufs.edu.cn": {
     "_name": "广东外语外贸大学",
     "www": [
@@ -34321,6 +34321,27 @@
       }
     ]
   },
+  "pawchive.pw": {
+    "_name": "Pawchive",
+    ".": [
+      {
+        "title": "Posts",
+        "docs": "https://docs.rsshub.app/routes/anime",
+        "source": [
+          "/"
+        ],
+        "target": "/pawchive/:service/:id"
+      },
+      {
+        "title": "Posts",
+        "docs": "https://docs.rsshub.app/routes/anime",
+        "source": [
+          "/:service/user/:id"
+        ],
+        "target": "/pawchive/:service/:id"
+      }
+    ]
+  },
   "pconline.com.cn": {
     "_name": "太平洋科技",
     ".": [
@@ -41973,7 +41994,7 @@
     "_name": "小宇宙",
     ".": [
       {
-        "title": "Unknown",
+        "title": "发现",
         "docs": "https://docs.rsshub.app/routes/multimedia",
         "source": [
           "/"
