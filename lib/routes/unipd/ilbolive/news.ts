@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-import type { Route } from '@/types';
+import type { Data, Route } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
@@ -33,7 +33,7 @@ export const route: Route = {
     handler,
 };
 
-async function handler() {
+async function handler(): Promise<Data> {
     const baseUrl = 'https://ilbolive.unipd.it';
     const homeUrl = `${baseUrl}/it/news`;
 

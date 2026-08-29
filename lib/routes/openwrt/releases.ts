@@ -34,7 +34,7 @@ async function handler(ctx) {
         title: $('h1').text() + ' - OpenWrt Releases',
         link: url,
         description: $('.dw-content div.level1').text(),
-        language: 'en-US',
+        language: 'en-us' as const,
         item: [
             {
                 title: table.find('.supported_current_rel').text(),

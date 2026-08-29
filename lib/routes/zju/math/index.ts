@@ -1,4 +1,5 @@
 import { load } from 'cheerio';
+import type { Context } from 'hono';
 
 import type { DataItem, Route } from '@/types';
 import cache from '@/utils/cache';
@@ -57,11 +58,11 @@ async function fetchNewsItemsByCategory(categoryId: string): Promise<NewsItem[]>
                 intranetOnly,
             };
         })
-        .filter(Boolean) as NewsItem[];
+        .filter((entry) => entry !== null);
 }
 
 async function enrichNewsItemWithDetails(item: NewsItem, refererUrl: string): Promise<DataItem> {
-    const dataItem = item.item as DataItem;
+    const dataItem = item.item;
 
     if (item.intranetOnly || !dataItem.link) {
         return dataItem;
@@ -118,7 +119,7 @@ export const route: Route = {
     url: 'www.math.zju.edu.cn',
 };
 
-async function handler(ctx: { req: { param: (arg0: string) => string } }) {
+async function handler(ctx: Context) {
     const type = Math.trunc(Number(ctx.req.param('type')));
     const categoryInfo = categoryMap.get(type);
 

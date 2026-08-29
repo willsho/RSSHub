@@ -110,7 +110,8 @@ async function handler(ctx) {
                 category,
             };
         })
-        .filter((item) => item && item.title && item.pubDate);
+        .filter((item) => item !== null)
+        .filter((item) => Boolean(item.title) && Boolean(item.pubDate));
 
     return {
         title: `${baseTitle} - ${info.title}`,

@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-import type { Route } from '@/types';
+import type { Data, DataItem, Route } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
@@ -65,7 +65,7 @@ export const route: Route = {
 | Workflow           | workflow           |`,
 };
 
-async function handler(ctx) {
+async function handler(ctx): Promise<Data> {
     const category = ctx.req.param('category');
     const baseUrl = 'https://www.smashingmagazine.com';
     const route = category ? `/category/${category}` : '/articles';
@@ -74,17 +74,17 @@ async function handler(ctx) {
 
     const listItems = $('article.article--post')
         .toArray()
-        .map((item) => {
-            item = $(item);
-            const a = item.find('h2.article--post__title a');
-            const description = item
+        .map((item): DataItem & { link: string } => {
+            const $item = $(item);
+            const a = $item.find('h2.article--post__title a');
+            const description = $item
                 .find('p.article--post__teaser')
                 .contents()
                 .filter((_, node) => node.type === 'text')
                 .text();
-            const author = item.find('span.article--post__author-name a').text();
+            const author = $item.find('span.article--post__author-name a').text();
             const time = $('p.article--post__teaser time').attr('datetime');
-            const pubDate = parseDate(time, 'YYYY-MM-DD');
+            const pubDate = parseDate(time!, 'YYYY-MM-DD');
             return {
                 title: a.text(),
                 link: `${baseUrl}${a.attr('href')}`,

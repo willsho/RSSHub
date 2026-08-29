@@ -1,4 +1,4 @@
-import type { Route } from '@/types';
+import type { Data, Route } from '@/types';
 import { ViewType } from '@/types';
 
 import { baseUrl, getData, getList, variables } from './utils.js';
@@ -91,7 +91,7 @@ export const route: Route = {
     },
 };
 
-async function handler(ctx) {
+async function handler(ctx): Promise<Data> {
     const limit = ctx.req.query('limit') ? Number(ctx.req.query('limit')) : 20;
     const dateSort = ctx.req.param('dateSort') ? JSON.parse(ctx.req.param('dateSort')) : true;
     const period = ctx.req.param('period') ? Number(ctx.req.param('period')) : 7;

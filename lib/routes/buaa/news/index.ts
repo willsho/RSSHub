@@ -48,7 +48,7 @@ async function handler(ctx: Context): Promise<Data> {
             };
         });
 
-    const result = (await Promise.all(
+    const result = await Promise.all(
         list.map((item) =>
             cache.tryGet(item.link!, async () => {
                 const response = await got(item.link);
@@ -60,7 +60,7 @@ async function handler(ctx: Context): Promise<Data> {
                 return item;
             })
         )
-    )) as DataItem[];
+    );
 
     return {
         title: `北航新闻 - ${title}`,

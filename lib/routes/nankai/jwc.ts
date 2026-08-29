@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-import type { Route } from '@/types';
+import type { DataItem, Route } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
@@ -26,7 +26,7 @@ export const route: Route = {
         },
     ],
     name: '教务处通知公告',
-    maintainers: ['vicguo0724'],
+    maintainers: ['zhongweili', 'vicguo0724'],
     description: '南开大学教务处通知公告',
     url: 'jwc.nankai.edu.cn',
     handler: async () => {
@@ -37,7 +37,7 @@ export const route: Route = {
         // 解析列表页面中的所有通知项
         const list = $('.page-con-list-news .item')
             .toArray()
-            .map((item) => {
+            .map((item): DataItem => {
                 const $item = $(item);
                 const $link = $item.find('.t a');
                 const $dateDay = $item.find('.d .d-d');
@@ -65,7 +65,7 @@ export const route: Route = {
         // 获取每个通知的详细内容
         const items = await Promise.all(
             list.map((item) =>
-                cache.tryGet(item.link, async () => {
+                cache.tryGet(item.link!, async () => {
                     try {
                         const { data: response } = await got(item.link);
                         const $ = load(response);
@@ -89,12 +89,8 @@ export const route: Route = {
                                 const sudyfileAttrJson = JSON.parse(sudyfileAttr);
                                 const fileName = sudyfileAttrJson.title || '未命名文件.pdf';
                                 if (pdfSrc) {
-                                    let pdfUrl = pdfSrc;
-                                    if (!pdfUrl.startsWith('http')) {
-                                        pdfUrl = `${baseUrl}${pdfUrl}`;
-                                    }
                                     // 替换PDF播放器为下载链接
-                                    $el.replaceWith(`<p><a href="${pdfUrl}" target="_blank">${fileName}</a></p>`);
+                                    $el.replaceWith(`<p><a href="${pdfSrc}" target="_blank">${fileName}</a></p>`);
                                 }
                             });
 

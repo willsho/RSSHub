@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-import type { Route } from '@/types';
+import type { Data, DataItem, Route } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
@@ -21,7 +21,7 @@ export const route: Route = {
     handler,
 };
 
-async function handler(ctx) {
+async function handler(ctx): Promise<Data> {
     const limit = ctx.req.query('limit') ? Number(ctx.req.query('limit')) : 10;
 
     const rootUrl = 'https://dongke.yangtzeu.edu.cn';
@@ -34,18 +34,18 @@ async function handler(ctx) {
     let items = $('ul.list-item li a')
         .slice(0, limit)
         .toArray()
-        .map((item) => {
-            item = $(item);
+        .map((item): DataItem => {
+            const $item = $(item);
 
             return {
-                title: item.text(),
-                link: new URL(item.prop('href'), rootUrl).href,
+                title: $item.text(),
+                link: new URL($item.prop('href')!, rootUrl).href,
             };
         });
 
     items = await Promise.all(
         items.map((item) =>
-            cache.tryGet(item.link, async () => {
+            cache.tryGet(item.link!, async () => {
                 const { data: detailResponse } = await got(item.link);
 
                 const content = load(detailResponse);
@@ -57,7 +57,7 @@ async function handler(ctx) {
                     parseDate(
                         content('p.content-info')
                             .text()
-                            .match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)[1]
+                            .match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)![0]
                     ),
                     8
                 );
@@ -71,8 +71,8 @@ async function handler(ctx) {
         item: items,
         title: $('title').text(),
         link: currentUrl,
-        language: 'zh-cn',
-        image: new URL($('#head-img a img').prop('src'), rootUrl).href,
+        language: 'zh-CN',
+        image: new URL($('#head-img a img').prop('src')!, rootUrl).href,
         author: '长江大学动物科学学院',
     };
 }

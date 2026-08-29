@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-import type { Route } from '@/types';
+import type { DataItem, Language, Route } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
@@ -55,15 +55,15 @@ async function handler(ctx) {
     let items = $('div#sort_body ul li a')
         .slice(0, limit)
         .toArray()
-        .map((item) => {
-            item = $(item);
+        .map((item): DataItem & { link: string } => {
+            const $item = $(item);
 
             return {
-                title: item.find('h1').text().trim(),
-                link: item.prop('href'),
-                description: item.find('div.abstract').html(),
-                author: item.find('div.source').text(),
-                pubDate: timezone(parseDate(item.find('div.time').text()), 8),
+                title: $item.find('h1').text().trim(),
+                link: $item.prop('href')!,
+                description: $item.find('div.abstract').html(),
+                author: $item.find('div.source').text(),
+                pubDate: timezone(parseDate($item.find('div.time').text()), 8),
             };
         });
 
@@ -78,7 +78,7 @@ async function handler(ctx) {
                 item.description = content('div.TRS_Editor').html();
                 item.author = content('span.cont-a-src a')
                     .toArray()
-                    .map((a) => content(a).text());
+                    .map((a) => ({ name: content(a).text() }));
                 item.pubDate = timezone(parseDate(content('span.time, div.pubtime div.w').contents().first().text().trim()), 8);
 
                 return item;
@@ -87,14 +87,16 @@ async function handler(ctx) {
     );
 
     const title = $('title').text();
-    const icon = new URL($('link[rel="icon"]').prop('href'), rootUrl).href;
+    const icon = new URL($('link[rel="icon"]').prop('href')!, rootUrl).href;
+
+    const language: Language = 'zh';
 
     return {
         item: items,
         title,
         link: currentUrl,
         description: $('meta[name="description"]').prop('content'),
-        language: 'zh',
+        language,
         icon,
         logo: icon,
         subtitle: $('div.h').text(),

@@ -119,14 +119,14 @@ async function handler(ctx) {
     );
 
     const author = '中国期货市场监控中心';
-    const image = new URL($('a.logo img').prop('src'), rootUrl).href;
+    const image = new URL($('a.logo img').prop('src')!, rootUrl).href;
 
     return {
         item: items,
         title: `${author} - ${$('h3.SubPage_t3').text()}`,
         link: currentUrl,
         description: $('meta[name="Description"]').prop('content'),
-        language: 'zh',
+        language: 'zh' as const,
         image,
         subtitle: $('meta[name="Keywords"]').prop('content'),
         author,

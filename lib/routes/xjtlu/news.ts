@@ -102,7 +102,10 @@ const handler = async (ctx) => {
                 // Parse date based on language
                 // English: "21 Jan 2026" with 'en' locale for month name recognition
                 // Chinese: "2026年01月20日" - numeric format, no locale needed
-                const pubDate = articleDate ? parseDate(articleDate, lang === 'en' ? 'DD MMM YYYY' : 'YYYY年MM月DD日', lang === 'en' ? 'en' : undefined) : undefined;
+                let pubDate: Date | undefined;
+                if (articleDate) {
+                    pubDate = lang === 'en' ? parseDate(articleDate, 'DD MMM YYYY', 'en') : parseDate(articleDate, 'YYYY年MM月DD日');
+                }
 
                 return {
                     title: item.title,

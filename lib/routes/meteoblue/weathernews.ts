@@ -64,7 +64,7 @@ async function handler() {
                 description,
             };
         })
-        .filter(Boolean);
+        .filter((article) => article !== null);
 
     return {
         title: 'meteoblue Weather News',

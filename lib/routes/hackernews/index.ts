@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-import type { Route } from '@/types';
+import type { DataItem, Route } from '@/types';
 import { ViewType } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
@@ -47,6 +47,14 @@ Examples:
 | \`/hackernews/over\` | \`/hackernews/submitted/sources/dang\` | \`/hackernews/threads/sources/dang\` | \`/hackernews/threads/comments_list/dang\` |`,
 };
 
+type Story = Omit<DataItem, 'comments' | 'upvotes'> & {
+    comments: string | number;
+    upvotes: string | number;
+    origin?: string;
+    onStory: string;
+    currentComment: string;
+};
+
 async function handler(ctx) {
     const section = ctx.req.param('section') ?? 'index';
     const type = ctx.req.param('type') ?? 'sources';
@@ -69,23 +77,23 @@ async function handler(ctx) {
         .slice(0, ctx.req.query('limit') ? Number.parseInt(ctx.req.query('limit')) : 30)
         .toArray()
         .map((thing) => {
-            thing = $(thing);
+            const $thing = $(thing);
 
-            const item = {
-                guid: thing.attr('id'),
-                title: thing.find('.titleline').children('a').text(),
-                category: thing.find('.sitestr').text(),
-                author: thing.next().find('.hnuser').text(),
-                pubDate: parseDate(thing.find('.age').attr('title') ?? thing.next().find('.age').attr('title')),
+            const item: Story = {
+                guid: $thing.attr('id'),
+                title: $thing.find('.titleline').children('a').text(),
+                category: $thing.find('.sitestr').text(),
+                author: $thing.next().find('.hnuser').text(),
+                pubDate: parseDate(($thing.find('.age').attr('title') ?? $thing.next().find('.age').attr('title'))!),
 
                 link: '',
-                origin: thing.find('.titleline').children('a').attr('href'),
-                onStory: thing.find('.onstory').text().slice(2),
+                origin: $thing.find('.titleline').children('a').attr('href'),
+                onStory: $thing.find('.onstory').text().slice(2),
 
-                comments: thing.next().find('a').last().text().split(' comment', 1)[0],
-                upvotes: thing.next().find('.score').text().split(' point', 1)[0],
+                comments: $thing.next().find('a').last().text().split(' comment', 1)[0],
+                upvotes: $thing.next().find('.score').text().split(' point', 1)[0],
 
-                currentComment: thing.find('.comment').text(),
+                currentComment: $thing.find('.comment').text(),
                 description: '',
             };
 
@@ -98,7 +106,7 @@ async function handler(ctx) {
 
     const items = await Promise.all(
         list.map((item) =>
-            cache.tryGet(item.guid, async () => {
+            cache.tryGet(item.guid!, async () => {
                 if (item.comments !== 'discuss' && type === 'comments') {
                     const detailResponse = await got({
                         method: 'get',
@@ -138,7 +146,7 @@ async function handler(ctx) {
                     item.comments = 0;
                 }
 
-                item.link = type === 'sources' ? item.origin : item.link;
+                item.link = (type === 'sources' ? item.origin : item.link)!;
 
                 delete item.origin;
 
@@ -150,6 +158,6 @@ async function handler(ctx) {
     return {
         title: $('title').text(),
         link: currentUrl,
-        item: items,
+        item: items as DataItem[],
     };
 }

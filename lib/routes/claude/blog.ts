@@ -83,7 +83,7 @@ async function handler(ctx) {
         title: 'Claude Blog',
         link,
         description: 'Product news and best practices for teams building with Claude.',
-        language: 'en',
+        language: 'en' as const,
         item: items,
     };
 }

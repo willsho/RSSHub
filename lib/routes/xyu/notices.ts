@@ -66,16 +66,13 @@ async function handler() {
                 pubDate: timezone(parseDate(dateText, 'YYYY-MM-DD'), 8),
             };
         })
-        .filter(Boolean);
+        .filter((item) => item !== null);
 
     const items = await Promise.all(
         list.map((item) =>
-            cache.tryGet(item?.link || '', async () => {
-                if (!item) {
-                    return '';
-                }
+            cache.tryGet(item.link, async () => {
                 try {
-                    const detailResponse = await ofetch(item?.link);
+                    const detailResponse = await ofetch(item.link);
                     if (!detailResponse) {
                         return {
                             ...item,

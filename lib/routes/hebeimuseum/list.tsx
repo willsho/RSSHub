@@ -95,16 +95,16 @@ export const route: Route = {
                 return {
                     title: listTitle,
                     itemLink: `${baseUrl}${link}`,
-                    imgUrl: `${baseUrl}${imgUrlRaw}`,
+                    imgUrl: imgUrlRaw,
                 };
             });
 
         const items = await Promise.all(
             list.map((item) => {
                 // use seperate cache key for special path
-                const cacheKey = isSpecial ? `${item.itemLink}-special` : (item.itemLink as string);
+                const cacheKey = isSpecial ? `${item.itemLink}-special` : item.itemLink;
 
-                return cache.tryGet(cacheKey, async (): Promise<Record<string, any>> => {
+                return cache.tryGet(cacheKey, async (): Promise<Partial<DataItem>> => {
                     const detailResponse = await got({
                         method: 'get',
                         url: item.itemLink,
@@ -125,11 +125,11 @@ export const route: Route = {
                                     <img src={item.imgUrl} />
                                 </div>
                             ),
-                        } as Record<string, any>;
+                        };
                     }
 
                     // Special path to return detail exhibition information
-                    let rawText = content('.content.f16').text() || ''; // get descption text from detail page
+                    let rawText = content('.content.f16').text(); // get descption text from detail page
 
                     rawText = rawText.replaceAll(/\s+/g, '');
 
@@ -139,7 +139,7 @@ export const route: Route = {
                     const fullDuration = texts.find((text) => text.includes('时间：'))?.replaceAll(/(?:展览)?时间：/g, '');
 
                     if (!fullDuration) {
-                        return {} as Record<string, any>;
+                        return {};
                     }
 
                     let location = texts.find((text) => text.includes('地点：'))?.replaceAll(/(?:展(?:览|出))?地点：/g, '') || '';
@@ -163,7 +163,7 @@ export const route: Route = {
                         }
                     }
 
-                    const { startDate, endDate } = extractDates(fullDuration || '');
+                    const { startDate, endDate } = extractDates(fullDuration);
                     const { imgUrl, itemLink } = item;
 
                     const description = renderToString(
@@ -182,11 +182,9 @@ export const route: Route = {
                                 <b>闭展：</b>
                                 {endDate ?? '未定/常设'}
                             </p>
-                            {fullDuration && (
-                                <p>
-                                    <small>原始展期：{fullDuration}</small>
-                                </p>
-                            )}
+                            <p>
+                                <small>原始展期：{fullDuration}</small>
+                            </p>
                         </div>
                     );
 
@@ -203,8 +201,8 @@ export const route: Route = {
                             endDate,
                             itemLink,
                         },
-                    } as Record<string, any>;
-                }) as Promise<DataItem>;
+                    };
+                });
             })
         );
 
@@ -212,7 +210,7 @@ export const route: Route = {
             title: `${museumName} - 临时展览${isSpecial ? ' - 特展详情' : ''}`,
             link: apiUrl,
             language: 'zh-CN',
-            item: items.filter((item) => item.title) as DataItem[],
+            item: items.filter((item): item is DataItem => Boolean(item.title)),
         };
     },
 };

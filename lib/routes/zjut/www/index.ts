@@ -43,7 +43,7 @@ export const route: Route = {
 | 校区班车   | xqbc       |`,
 };
 
-async function handler(ctx) {
+async function handler(ctx): Promise<Data> {
     const type = ctx.req.param('type');
     const response = await ofetch(rootUrl + type + '/list.htm');
     const $ = load(response);
@@ -102,7 +102,7 @@ async function handler(ctx) {
                     } else {
                         const response = await ofetch(item.link);
                         const $ = load(response);
-                        newItem.description = $('div.wp_articlecontent').html();
+                        newItem.description = $('div.wp_articlecontent').html() ?? '';
                     }
                 } else {
                     // 涉及到其他站点，不方便做统一的 html 解析，直接返回链接
@@ -117,5 +117,5 @@ async function handler(ctx) {
         title: $('head > title').text() + ' - 浙江工业大学',
         link: rootUrl + type,
         item: items,
-    } as Data;
+    };
 }

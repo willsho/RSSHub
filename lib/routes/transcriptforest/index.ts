@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-import type { Route } from '@/types';
+import type { Language, Route } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
@@ -174,15 +174,17 @@ async function handler(ctx) {
 
     const title = $('title').text();
     const image = $('meta[property="og:image"]').prop('content');
-    const icon = new URL($('link[rel="apple-touch-icon"]').prop('href'), rootUrl).href;
+    const icon = new URL($('link[rel="apple-touch-icon"]').prop('href')!, rootUrl).href;
     const author = title.split(/\|/, 1)[0].trim();
+
+    const language = $('html').prop('lang') as Language;
 
     return {
         item: items,
         title,
         link: currentUrl,
         description: $('meta[name="description"]').prop('content'),
-        language: $('html').prop('lang'),
+        language,
         image,
         icon,
         logo: icon,

@@ -53,7 +53,7 @@ export const handler = async () => {
                 description: title,
             };
         })
-        .filter(Boolean);
+        .filter((item) => item !== null);
 
     return {
         title: `${author} - ${pageTitle}`,

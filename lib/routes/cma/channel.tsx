@@ -121,8 +121,8 @@ async function handler(ctx) {
         ),
     ].join(' > ');
     const descriptionHtml = $('div.xml').html();
-    const image = new URL($('li.active a img').prop('src'), rootUrl).href;
-    const icon = new URL($('link[rel="shortcut icon"]').prop('href'), rootUrl).href;
+    const image = new URL($('li.active a img').prop('src')!, rootUrl).href;
+    const icon = new URL($('link[rel="shortcut icon"]').prop('href')!, rootUrl).href;
     const sourceElement = $('div.col-xs-8 span')
         .toArray()
         .findLast((element) => $(element).text().startsWith('来源'));
@@ -155,7 +155,7 @@ async function handler(ctx) {
         title: `${author} - ${title}`,
         link: currentUrl,
         description: $('meta[name="description"]').prop('content'),
-        language: 'zh',
+        language: 'zh' as const,
         image,
         icon,
         logo: icon,

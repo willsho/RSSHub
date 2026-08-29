@@ -39,7 +39,7 @@ export const route: Route = {
         const $ = load(response);
 
         // 获取分类名称映射
-        const categoryMap: Record<string, string> = {
+        const categoryMap = {
             zxdt: '最新动态',
             '82': '综合信息',
             '83': '招生工作',
@@ -72,7 +72,7 @@ export const route: Route = {
                 const pubDate = timezone(parseDate(dateStr, 'YYYY-MM-DD'), 8);
 
                 return {
-                    title,
+                    title: title!,
                     link,
                     pubDate,
                     author: '研究生院',
@@ -110,7 +110,7 @@ export const route: Route = {
                         });
                     }
 
-                    item.description = $description.html() || item.title;
+                    item.description = ($description.html() || item.title)!;
                     return item;
                 })
             )

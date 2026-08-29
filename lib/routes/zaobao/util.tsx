@@ -44,18 +44,19 @@ export const parseList = async (
     const resultList = await Promise.all(
         data.toArray().map((item) => {
             const $item = $(item);
-            const link = baseUrl + $item.attr('href');
+            const href = $item.attr('href') as string;
+            const link = baseUrl + href;
 
             return cache.tryGet(link, async () => {
-                if ($item.attr('href')?.includes('https://')) {
+                if (href.includes('https://')) {
                     const isSingapore = pageResponse.url.startsWith('https://www.zaobao.com.sg/');
                     return {
                         title: isSingapore ? $item.text().trim() : ($item.attr('title')?.trim() as string),
-                        link: $item.attr('href') as string,
+                        link: href,
                         pubDate: timezone($item.next().text().trim().includes(':') ? parseDate($item.next().text().trim(), 'HH:mm') : parseDate($item.next().text().trim(), 'MM月DD日'), 8),
                     };
                 }
-                const response = await ofetch.raw(new URL($item.attr('href') as string, origin).href);
+                const response = await ofetch.raw(new URL(href, origin).href);
                 let $1 = load(response._data);
 
                 let category, images;
@@ -73,7 +74,7 @@ export const parseList = async (
                         .attr('content')
                         ?.split(',')
                         .map((s) => s.trim());
-                    $1 = load($1('.articleBody').html(), null, false);
+                    $1 = load($1('.articleBody').html()!, null, false);
                     images = [{ url: ldJson.image[0].url }];
                 } else {
                     category = ldJson.keywords?.split(',');
@@ -155,7 +156,7 @@ export interface ImageData {
     title?: string;
 }
 
-const processImageData = (isSg, images, $1) => {
+const processImageData = (isSg, images, $1): ImageData[] => {
     if (isSg && images) {
         return images.map((img) => ({
             type: 'data',
@@ -165,7 +166,7 @@ const processImageData = (isSg, images, $1) => {
                 .replaceAll('s3/files', 's3fs-public')
                 .split('?', 1)[0],
             title: img.caption,
-        })) as ImageData[];
+        }));
     }
 
     const hkImg = $1('[data-testid="article-banner"] img');
@@ -181,7 +182,7 @@ const processImageData = (isSg, images, $1) => {
                     .split('?', 1)[0],
                 title: hkImg.attr('title'),
             },
-        ] as ImageData[];
+        ];
     }
 
     return [];

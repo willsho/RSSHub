@@ -3,7 +3,7 @@ import { load } from 'cheerio';
 import type { Element } from 'domhandler';
 import type { Context } from 'hono';
 
-import type { Data, DataItem, Route } from '@/types';
+import type { Data, DataItem, Language, Route } from '@/types';
 import { ViewType } from '@/types';
 import ofetch from '@/utils/ofetch';
 import { parseDate } from '@/utils/parse-date';
@@ -17,14 +17,14 @@ export const handler = async (ctx: Context): Promise<Data> => {
 
     const response = await ofetch(targetUrl);
     const $: CheerioAPI = load(response);
-    const language = $('html').attr('lang') ?? 'ja';
+    const language = ($('html').attr('lang') ?? 'ja') as Language;
 
     const author: string = $('span.drawer-branding__subtitle').text();
 
     const items: DataItem[] = $('a.sizeview')
         .slice(0, limit)
         .toArray()
-        .map((el): Element => {
+        .map((el) => {
             const $el: Cheerio<Element> = $(el);
             const $pEl: Cheerio<Element> = $el.parent('p');
 
@@ -67,13 +67,15 @@ export const handler = async (ctx: Context): Promise<Data> => {
             return processedItem;
         });
 
+    const logoSrc: string | undefined = $('img.common-branding__logo-image').attr('src');
+
     return {
         title: $('title').text(),
         description: $('meta[name="keywords"]').attr('content'),
         link: targetUrl,
         item: items,
         allowEmpty: true,
-        image: $('img.common-branding__logo-image').attr('src') ? new URL($('img.common-branding__logo-image').attr('src') as string, baseUrl).href : undefined,
+        image: logoSrc ? new URL(logoSrc, baseUrl).href : undefined,
         author,
         language,
         id: targetUrl,
